@@ -1,0 +1,6 @@
+spring:
+ application:
+  name: practice_application
+
+server:
+    port: 8085
