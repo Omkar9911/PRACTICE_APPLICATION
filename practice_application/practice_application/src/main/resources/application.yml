@@ -1,6 +1,17 @@
 spring:
- application:
-  name: practice_application
+  application:
+    name: practice_application
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/practice-application
 
 server:
-    port: 8085
+  port: 8085
+
+
+jwt:
+  secret: {secret}
+  issuer: {issuer}
+  type: JWT
+  audience: {audience}
