@@ -3,10 +3,9 @@ package com.practice_application.practice_application.auth;
 import com.practice_application.practice_application.dao.UserMasterDao;
 import com.practice_application.practice_application.entity.UserMaster;
 import com.practice_application.practice_application.response.JWTResponse;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -74,12 +73,13 @@ public class JwtTokenUtil implements Serializable {
 
     private Claims getAllClaimsFromToken(String token) {
         return Jwts.parser()
-                .setSigningKey(Keys.hmacShaKeyFor(jwtSecret.getBytes()))
-                .parseClaimsJws(token)
-                .getBody();
+                .verifyWith(Keys.hmacShaKeyFor(jwtSecret.getBytes()))
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
-    private Boolean isTokenExpired(String token) {
+    public Boolean isTokenExpired(String token) {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
     }
@@ -99,7 +99,7 @@ public class JwtTokenUtil implements Serializable {
                 .build();
     }
 
-    private String doGenerateToken(Map<String, Object> claims, UserMaster subject) {
+   /* private String doGenerateToken(Map<String, Object> claims, UserMaster subject) {
         return Jwts.builder()
                 .signWith(Keys.hmacShaKeyFor(jwtSecret.getBytes()), SignatureAlgorithm.HS256)
                 .setHeaderParam("type", jwtType)
@@ -109,6 +109,35 @@ public class JwtTokenUtil implements Serializable {
                 .setId(subject.getId().toString())
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
                 .compact();
+    }*/
+
+
+    private String doGenerateToken(Map<String, Object> claims, UserMaster subject) {
+        return Jwts.builder()
+                .signWith(Keys.hmacShaKeyFor(jwtSecret.getBytes())) // Uses `SecretKey` directly, no SignatureAlgorithm needed
+
+                .claim("issuer", jwtIssuer)
+                .claim("audience", jwtAudience)
+                .claim("email", subject.getEmail())
+                .claim("id", subject.getId()).claims(claims).expiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
+                .compact(); // Compiles and signs the token
+    }
+
+    public boolean isTokenValid(String token) {
+
+        try {
+            Jwts.parser()
+                    .verifyWith(Keys.hmacShaKeyFor(jwtSecret.getBytes()))
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+            return true; // If parsing succeeds, the token is valid
+        } catch (SignatureException | MalformedJwtException | ExpiredJwtException |
+                 UnsupportedJwtException | IllegalArgumentException e) {
+            return false; // the token is invalid
+        }
+
+
     }
 
   /*  public Boolean canTokenBeRefreshed(String token) {

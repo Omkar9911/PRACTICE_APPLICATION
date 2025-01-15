@@ -8,8 +8,10 @@ import com.practice_application.practice_application.service.RetrospectiveServic
 import com.practice_application.practice_application.utility.BaseResponse;
 import com.practice_application.practice_application.utility.BaseResponseBuilder;
 import com.practice_application.practice_application.utility.StatusCodeEnum;
+import com.practice_application.practice_application.utility.Utility;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,10 @@ public class RetrospectiveController {
     @Autowired
     private RetrospectiveService retrospectiveService;
 
+    @Autowired
+    private Utility utility;
+
+
 
     @PostMapping("/createRetrospectiveV1")
     public ResponseEntity<BaseResponse> createRetrospectiveV1(
@@ -40,13 +46,13 @@ public class RetrospectiveController {
             @RequestParam String orgId,
             @RequestParam String endTime) {
 
-    /* JSONObject authResponse = utility.authenticationV1(request.getHeader("Authorization"));
+     JSONObject authResponse = utility.authentication(request.getHeader("Authorization"));
     if (!authResponse.optBoolean("success", false)) {
         return new ResponseEntity<>(new BaseResponseBuilder().setBaseResponseWithStatusAndCodeAndCustomMessage(
                 HttpStatus.UNAUTHORIZED.name(), StatusCodeEnum.UNAUTHORIZED_CODE.getCode(), authResponse.optString("message", "Unauthorized access")), HttpStatus.UNAUTHORIZED);
-    } */
+    }
 
-        // log.info("Getting /createRetrospectiveV1");
+         log.info("Getting /createRetrospectiveV1");
 
         RetrospectiveMasterDto retrospective = retrospectiveService.createRetrospectiveV1(
                 retrospectiveTitle,
