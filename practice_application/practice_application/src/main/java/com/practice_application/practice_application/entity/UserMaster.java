@@ -40,6 +40,9 @@ public class UserMaster {
     @Field(name = "OTP_VALIDITY_DATE")
     private LocalDateTime otpValidityDate;
 
+    @Field(name =  "CREATED_DATE")
+    private LocalDateTime createdDate;
+
     @Field(name = "OTP")
     private String otp;
 

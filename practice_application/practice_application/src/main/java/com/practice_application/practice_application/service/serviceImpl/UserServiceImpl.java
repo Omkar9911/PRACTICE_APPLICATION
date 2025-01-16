@@ -68,6 +68,7 @@ public class UserServiceImpl implements UserService {
             String otp = userUtility.generateOTP();
             entity.setOtp(otp);
             entity.setOtpValidityDate(LocalDateTime.now().plusMinutes(5));
+            entity.setCreatedDate(LocalDateTime.now());
             mongoTemplate.save(entity);
 
         }
